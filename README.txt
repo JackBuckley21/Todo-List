@@ -1,0 +1,1 @@
+To start program use: npm run dev-server in the terminal
