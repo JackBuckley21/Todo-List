@@ -7,10 +7,11 @@ class Form extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            todos: new Map(),
+            todos: [],
             hideComplete: false,
             newTodo: "",
         };
+
         this.getTodos();
     }
 
@@ -23,10 +24,7 @@ class Form extends Component {
     getTodos() {
         axios.get("api/todos").then((res) => {
             console.log(res.data);
-            const todoData = new Map(res.data);
-            this.setState({
-                todos: todoData,
-            });
+            this.setState({ todos: res.data });
         });
     }
 
@@ -35,24 +33,15 @@ class Form extends Component {
 
         const { todos, newTodo, nextId } = this.state;
 
-        if (this.state.newTodo === "") {
+        if (!this.state.newTodo.trim()) {
             alert("Please enter a valid todo item!");
         } else {
-
             axios
                 .post("api/todos/new-todo", { text: this.state.newTodo })
                 .then((res) => {
                     console.log(res.data);
-                    if (res.status === 200) {
-                        console.log("Great Success");
 
-                        todos.set(res.data, {
-                            text: newTodo,
-                        });
-                        this.setState({
-                            newTodo: "",
-                        });
-                    }
+                    this.setState({ todos: res.data });
                 })
                 .catch((err) => console.log(err));
         }
@@ -63,10 +52,8 @@ class Form extends Component {
         axios
             .delete(baseUrl + "/todos/delete-all")
             .then((res) => {
-                this.state.todos.clear();
-
                 this.setState({
-                    todos: this.state.todos,
+                    todos: [],
                 });
             })
             .catch((err) => console.log(err));
@@ -76,9 +63,15 @@ class Form extends Component {
         axios
             .delete(baseUrl + "/todos/delete/" + todoId)
             .then((res) => {
-                this.state.todos.delete(todoId);
+                console.log(res);
+                console.log(this.state.todos);
+                let remove = this.state.todos.filter(
+                    (todo) => todo._id != todoId
+                );
+                console.log(remove);
+
                 this.setState({
-                    todos: this.state.todos,
+                    todos: remove,
                 });
             })
             .catch((err) => {
@@ -92,14 +85,11 @@ class Form extends Component {
         axios
             .delete(baseUrl + "/todos/clear-complete-todos")
             .then((res) => {
-                for (const [id, todo] of this.state.todos.entries()) {
-                    if (todo.isComplete) {
-                        this.state.todos.delete(id);
-                    }
-                }
-                this.setState({
-                    todos: this.state.todos,
-                });
+                console.log(res.data);
+
+                let clear = this.state.todos.filter((todo) => !todo.isComplete);
+
+                this.setState({ todos: clear });
             })
             .catch((err) => {
                 console.log(err);
@@ -111,17 +101,17 @@ class Form extends Component {
             .put(baseUrl + "/todos/is-complete/" + todoId)
             .then((res) => {
                 console.log(res);
-                let todo = this.state.todos.get(todoId);
-                console.log(todo);
-                this.state.todos.set(todoId, {
-                    text: todo.text,
-                    isComplete: !todo.isComplete,
+                let todoComplete = this.state.todos.map((todo) => {
+                    if (todo._id == todoId) {
+                        todo.isComplete = !todo.isComplete;
+                    }
+                    console.log(todoComplete);
+                    return todo;
                 });
 
                 this.setState({
-                    todos: this.state.todos,
+                    todos: todoComplete,
                 });
-                todo = this.state.todos.get(todoId);
             })
             .catch((err) => {
                 console.log(err);
