@@ -10,12 +10,11 @@ class TodoArea extends Component {
     // Renders todo List items //
     render() {
         let todos = [];
-        for (const [id, todo] of this.props.todos.entries()) {
+        for (const todo of this.props.todos) {
             if (!(this.props.hideComplete && todo.isComplete)) {
                 todos.push(
                     <TodoStates
-                        key={id}
-                        todoId={id}
+                        key={todo._id}
                         todo={todo}
                         completeHandler={(todoId) => {
                             this.props.completeHandler(todoId);
@@ -29,10 +28,8 @@ class TodoArea extends Component {
         }
 
         //todoStates
-        return <div>{todos}</div>;
+        return <div class="Todo-List">{todos}</div>;
     }
 }
 
 export default TodoArea;
-
-// (!(1&& 2) || 3)

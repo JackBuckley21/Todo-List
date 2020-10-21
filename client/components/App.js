@@ -1,16 +1,23 @@
 import React, { Component } from "react";
 import TodoArea from "./TodoArea.js";
 import axios from "axios";
+import {
+    EyeClosedIcon,
+    PlusCircleIcon,
+    TasklistIcon,
+    XCircleIcon,
+} from "@primer/octicons-react";
 const baseUrl = "api/";
 
 class Form extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            todos: new Map(),
+            todos: [],
             hideComplete: false,
             newTodo: "",
         };
+
         this.getTodos();
     }
 
@@ -23,10 +30,7 @@ class Form extends Component {
     getTodos() {
         axios.get("api/todos").then((res) => {
             console.log(res.data);
-            const todoData = new Map(res.data);
-            this.setState({
-                todos: todoData,
-            });
+            this.setState({ todos: res.data });
         });
     }
 
@@ -35,24 +39,15 @@ class Form extends Component {
 
         const { todos, newTodo, nextId } = this.state;
 
-        if (this.state.newTodo === "") {
+        if (!this.state.newTodo.trim()) {
             alert("Please enter a valid todo item!");
         } else {
-
             axios
                 .post("api/todos/new-todo", { text: this.state.newTodo })
                 .then((res) => {
                     console.log(res.data);
-                    if (res.status === 200) {
-                        console.log("Great Success");
 
-                        todos.set(res.data, {
-                            text: newTodo,
-                        });
-                        this.setState({
-                            newTodo: "",
-                        });
-                    }
+                    this.setState({ todos: res.data });
                 })
                 .catch((err) => console.log(err));
         }
@@ -63,10 +58,8 @@ class Form extends Component {
         axios
             .delete(baseUrl + "/todos/delete-all")
             .then((res) => {
-                this.state.todos.clear();
-
                 this.setState({
-                    todos: this.state.todos,
+                    todos: [],
                 });
             })
             .catch((err) => console.log(err));
@@ -76,9 +69,15 @@ class Form extends Component {
         axios
             .delete(baseUrl + "/todos/delete/" + todoId)
             .then((res) => {
-                this.state.todos.delete(todoId);
+                console.log(res);
+                console.log(this.state.todos);
+                let remove = this.state.todos.filter(
+                    (todo) => todo._id != todoId
+                );
+                console.log(remove);
+
                 this.setState({
-                    todos: this.state.todos,
+                    todos: remove,
                 });
             })
             .catch((err) => {
@@ -92,14 +91,11 @@ class Form extends Component {
         axios
             .delete(baseUrl + "/todos/clear-complete-todos")
             .then((res) => {
-                for (const [id, todo] of this.state.todos.entries()) {
-                    if (todo.isComplete) {
-                        this.state.todos.delete(id);
-                    }
-                }
-                this.setState({
-                    todos: this.state.todos,
-                });
+                console.log(res.data);
+
+                let clear = this.state.todos.filter((todo) => !todo.isComplete);
+
+                this.setState({ todos: clear });
             })
             .catch((err) => {
                 console.log(err);
@@ -111,24 +107,25 @@ class Form extends Component {
             .put(baseUrl + "/todos/is-complete/" + todoId)
             .then((res) => {
                 console.log(res);
-                let todo = this.state.todos.get(todoId);
-                console.log(todo);
-                this.state.todos.set(todoId, {
-                    text: todo.text,
-                    isComplete: !todo.isComplete,
+                let todoComplete = this.state.todos.map((todo) => {
+                    if (todo._id == todoId) {
+                        todo.isComplete = !todo.isComplete;
+                    }
+                    console.log(todoComplete);
+                    return todo;
                 });
 
                 this.setState({
-                    todos: this.state.todos,
+                    todos: todoComplete,
                 });
-                todo = this.state.todos.get(todoId);
             })
             .catch((err) => {
                 console.log(err);
             });
     }
 
-    showHideCompletedTodos() {
+    showHideCompletedTodos(event) {
+        event.preventDefault();
         this.state.hideComplete = !this.state.hideComplete;
 
         this.setState({
@@ -140,47 +137,66 @@ class Form extends Component {
         return (
             <div className="container">
                 <h1>Todo App</h1>
-                <section>
+                <section className="todo-form">
                     <form>
                         <input
+                            className="newTodoInput"
                             id="new_todo_input"
                             type="text"
                             name="newTodo"
-                            onChange={this.handleChange.bind(this)}
+                            onChange={(event) => this.handleChange(event)}
                             value={this.state.newTodo}
                             placeholder="Something that needs doing"
                         />
+
                         <button
-                            onClick={this.addTodo.bind(this)}
+                            style={{
+                                display: this.state.newTodo ? "" : "none",
+                            }}
+                            className="base-btn"
+                            onClick={(event) => this.addTodo(event)}
                             id="new_todo_submit"
                         >
-                            Add Todo
+                            <PlusCircleIcon size={20} />
                         </button>
-                        <label>
-                            Show / Hide Completed Todos
-                            <input
-                                onClick={this.showHideCompletedTodos.bind(this)}
-                                id="toggle_complete"
-                                type="checkbox"
-                            />
-                        </label>
-                        <button onClick={this.clearCompleteTodos.bind(this)}>
-                            Remove Completed Todos
-                        </button>
-                        <button
-                            onClick={this.removeAll.bind(this)}
-                            id="remove_all"
-                        >
-                            Remove All Todos
-                        </button>
+                        <div className="Remove-func">
+                            <label>
+                                <button
+                                    className=" button show-hide-btn left"
+                                    onClick={(event) =>
+                                        this.showHideCompletedTodos(event)
+                                    }
+                                >
+                                    Show/Hide Completed Todos{" "}
+                                    <EyeClosedIcon size={20} />
+                                </button>
+                            </label>
+                            <button
+                                className="button clearCompleted-btn center"
+                                onClick={(event) =>
+                                    this.clearCompleteTodos(event)
+                                }
+                            >
+                                Remove Completed Todos{" "}
+                                <TasklistIcon size={20} />
+                            </button>
+                            <button
+                                className="button remove-all-btn right-top"
+                                onClick={(event) => this.removeAll(event)}
+                                id="remove_all"
+                            >
+                                Remove All Todos <XCircleIcon size={20} />
+                            </button>
+                        </div>
                     </form>
-
-                    <TodoArea
-                        todos={this.state.todos}
-                        completeHandler={this.isComplete.bind(this)}
-                        removeHandler={this.removeTodo.bind(this)}
-                        hideComplete={this.state.hideComplete}
-                    />
+                    <div className="todo-area">
+                        <TodoArea
+                            todos={this.state.todos}
+                            completeHandler={(event) => this.isComplete(event)}
+                            removeHandler={(event) => this.removeTodo(event)}
+                            hideComplete={this.state.hideComplete}
+                        />
+                    </div>
                 </section>
             </div>
         );

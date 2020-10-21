@@ -1,5 +1,5 @@
 import express from "express";
-import fs from "fs";
+import todos from "./Schema.mjs";
 
 import mongoose from "mongoose";
 mongoose.connect("mongodb://localhost/test", { useNewUrlParser: true });
@@ -14,85 +14,84 @@ const app = express();
 
 app.use(express.json());
 
-function rf() {
-    return JSON.parse(fs.readFileSync("./server/data.json"));
-}
+let serverTodos = [];
+
+todos.find({}, function (err, docs) {
+    serverTodos = docs;
+    console.log(docs);
+});
 
 app.get("/todos", (req, res) => {
-    res.send(rf());
+    res.send(serverTodos);
 });
 
 app.post("/todos/new-todo", function (req, res) {
-    console.log(req.body.text);
-    const newId = +new Date();
-    let serverData = new Map(rf());
     let newTodo = req.body.text;
-    serverData.set(newId, {
-        text: newTodo,
-        isComplete: false,
-    });
-
-    fs.writeFileSync("./server/data.json", JSON.stringify([...serverData]));
-    console.log(serverData);
-    res.send(JSON.stringify(newId));
+    let newTodos = new todos({ text: newTodo, isComplete: false });
+    newTodos.save();
+    serverTodos.push(newTodos);
+    res.send(serverTodos);
 });
 
 app.delete("/todos/delete/:id", function (req, res) {
-    const todoId = parseInt(req.params.id);
-    try {
-        let serverData = new Map(rf());
-        serverData.delete(todoId);
-        console.log(serverData);
-        fs.writeFileSync("./server/data.json", JSON.stringify([...serverData]));
-    } catch {}
+    console.log(req.params.id);
+
+    todos.findByIdAndRemove(
+        req.params.id,
+        { useFindAndModify: false },
+        (err) => {
+            console.log(err);
+        }
+    );
+
+    serverTodos = serverTodos.filter((todo) => todo._id != req.params.id);
 
     res.send(true);
 });
 
 app.delete("/todos/delete-all", function (req, res) {
-    try {
-        let serverData = new Map(rf());
-        serverData.clear();
-        console.log(serverData);
-        fs.writeFileSync("./server/data.json", JSON.stringify([...serverData]));
-    } catch {}
-
+    serverTodos = [];
+    todos.deleteMany({}, (err) => {
+        console.log(err);
+    });
     res.send(true);
 });
 
 app.delete("/todos/clear-complete-todos", function (req, res) {
-    let serverData = new Map(rf());
+    todos.deleteMany({ isComplete: true }, (err) => {
+        console.log(err);
+        console.log("test");
+    });
 
-    for (const [id, todo] of serverData.entries()) {
-        if (todo.isComplete) {
-            serverData.delete(id);
-            fs.writeFileSync(
-                "./server/data.json",
-                JSON.stringify([...serverData])
-            );
-        } else {
-            console.log("There was an issue rsemoving comepleted todos");
-        }
-    }
+    serverTodos = serverTodos.filter((todo) => !todo.isComplete);
+
     res.send(true);
 });
 
 app.put("/todos/is-complete/:id", function (req, res) {
-    const todoId = parseInt(req.params.id);
-    let serverData = new Map(rf());
-    const todo = serverData.get(todoId);
+    console.log(req.params.id);
 
-    let status = true;
-    try {
-        serverData.set(todoId, {
-            text: todo.text,
-            isComplete: !todo.isComplete,
-        });
-        fs.writeFileSync("./server/data.json", JSON.stringify([...serverData]));
-    } catch (err) {
-        console.log(err);
-        status = false;
-    }
+    let completeStatus;
+
+    serverTodos = serverTodos.map((todo) => {
+        if (todo._id == req.params.id) {
+            todo.isComplete = !todo.isComplete;
+            completeStatus = todo.isComplete;
+        }
+
+        return todo;
+    });
+
+    console.log(completeStatus);
+
+    todos.findByIdAndUpdate(
+        req.params.id,
+        { isComplete: completeStatus },
+        { useFindAndModify: false },
+        (err) => {
+            console.log(err);
+        }
+    );
 
     res.send(true);
 });

@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { CheckCircleIcon, TrashIcon } from "@primer/octicons-react";
 
 class todoStates extends Component {
     constructor(props) {
@@ -10,17 +11,25 @@ class todoStates extends Component {
         return (
             <div>
                 {this.props.todo.text}
-                <input
-                    onClick={() =>
-                        this.props.completeHandler(this.props.todoId)
-                    }
-                    id="toggle_complete"
-                    type="checkbox"
-                ></input>
                 <button
-                    onClick={() => this.props.removeHandler(this.props.todoId)}
+                    style={{
+                        color: this.props.todo.isComplete ? "lime" : "",
+                    }}
+                    className="completed-handler-btn right"
+                    onClick={() =>
+                        this.props.completeHandler(this.props.todo._id)
+                    }
+                    // defaultChecked={this.props.todo.isComplete}
                 >
-                    X
+                    <CheckCircleIcon size={18} />
+                </button>
+                <button
+                    className="button remove-handler-btn right"
+                    onClick={() =>
+                        this.props.removeHandler(this.props.todo._id)
+                    }
+                >
+                    <TrashIcon size={20} />
                 </button>
             </div>
         );
