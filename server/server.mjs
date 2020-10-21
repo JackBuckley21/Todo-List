@@ -21,6 +21,10 @@ todos.find({}, function (err, docs) {
     console.log(docs);
 });
 
+function rf() {
+    return JSON.parse(fs.readFileSync("./server/data.json"));
+}
+
 app.get("/todos", (req, res) => {
     res.send(serverTodos);
 });

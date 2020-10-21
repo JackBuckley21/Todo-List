@@ -1,112 +1,112 @@
 body {
-    background-color: rgb(25 29 33);
-    height: 100vh;
-    padding: 30px;
-    font-family: "Courier New", Courier, monospace;
-    color: aliceblue;
-    font-size: 17px;
+  background-color: rgb(25 29 33);
+  height: 100vh;
+  padding: 30px;
+  font-family: "Courier New", Courier, monospace;
+  color: aliceblue;
+  font-size: 17px;
 }
 h1 {
-    padding: 5px;
-    font-size: 53px;
-    margin-left: 8px;
+  padding: 5px;
+  font-size: 53px;
+  margin-left: 8px;
 }
 form {
-    padding: 10px;
+  padding: 10px;
 }
 .Remove-func {
-    padding-top: 15px;
+  padding-top: 15px;
 }
 .container {
-    padding: 10px;
+  padding: 10px;
 }
 .todo-area {
-    padding: 10px;
-    text-transform: capitalize;
-    margin-left: 6px;
-    margin-top: 10px;
+  padding: 10px;
+  text-transform: capitalize;
+  margin-left: 6px;
+  margin-top: 10px;
 }
 .base-btn {
-    background-color: transparent;
-    color: white;
-    border: none;
+  background-color: transparent;
+  color: white;
+  border: none;
 }
 .newTodoInput {
-    border: none;
-    border-radius: 8px;
-    background-color: whitesmoke;
-    width: 560px;
-    text-align: center;
-    margin-left: 5px;
+  border: none;
+  border-radius: 8px;
+  background-color: whitesmoke;
+  width: 560px;
+  text-align: center;
+  margin-left: 5px;
 }
 button {
-    padding: 0 px;
-    outline: transparent;
+  padding: 0 px;
+  outline: transparent;
 }
 .clearCompleted-btn {
-    position: absolute;
-    margin-left: 150px;
-    background-color: transparent;
-    color: white;
-    border: none;
+  position: absolute;
+  margin-left: 150px;
+  background-color: transparent;
+  color: white;
+  border: none;
 }
 .remove-all-btn {
-    position: absolute;
-    margin-left: 590px;
-    background-color: transparent;
-    color: white;
-    border: none;
+  position: absolute;
+  margin-left: 590px;
+  background-color: transparent;
+  color: white;
+  border: none;
 }
 .remove-handler-btn {
-    background-color: transparent;
-    color: white;
-    border: none;
-    padding: 5px;
+  background-color: transparent;
+  color: white;
+  border: none;
+  padding: 5px;
 }
 
 .Todo-List {
-    margin-top: 0px;
+  margin-top: 0px;
 }
 
 .toggle_complete {
-    position: absolute;
-    padding-left: 13px;
+  position: absolute;
+  padding-left: 13px;
 }
 
 .right {
-    position: absolute;
-    right: 0px;
-    margin-right: 265px;
+  position: absolute;
+  right: 0px;
+  margin-right: 265px;
 }
 .completed-handler-btn {
-    background-color: transparent;
-    border: none;
-    color: white;
-    margin-right: 300px;
-    margin-top: 4px;
+  background-color: transparent;
+  border: none;
+  color: white;
+  margin-right: 300px;
+  margin-top: 4px;
 }
 .show-hide-btn {
-    background-color: transparent;
-    border: none;
-    color: white;
+  background-color: transparent;
+  border: none;
+  color: white;
 }
 .hide-btn {
-    background-color: transparent;
-    border: none;
-    color: white;
-    margin-right: 80px;
+  background-color: transparent;
+  border: none;
+  color: white;
+  margin-right: 80px;
 }
 .left {
-    position: absolute;
+  position: absolute;
 }
 
 .center {
-    position: absolute;
-    margin-left: 420px;
-    margin-top: 10px;
+  position: absolute;
+  margin-left: 420px;
+  margin-top: 10px;
 }
 
 .right-top {
-    margin-left: 800px;
-    margin-top: 10px;
+  margin-left: 800px;
+  margin-top: 10px;
 }
