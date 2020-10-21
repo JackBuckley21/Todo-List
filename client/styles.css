@@ -50,6 +50,9 @@ button {
     color: white;
     border: none;
 }
+.clearCompleted-btn:hover {
+    color: lime;
+}
 .remove-all-btn {
     position: absolute;
     margin-left: 590px;
@@ -57,11 +60,18 @@ button {
     color: white;
     border: none;
 }
+.remove-all-btn:hover {
+    color: red;
+}
 .remove-handler-btn {
     background-color: transparent;
     color: white;
     border: none;
     padding: 5px;
+}
+
+.remove-handler-btn:hover {
+    color: red;
 }
 
 .Todo-List {
@@ -85,10 +95,16 @@ button {
     margin-right: 300px;
     margin-top: 4px;
 }
+.completed-handler-btn:hover {
+    color: lime;
+}
 .show-hide-btn {
     background-color: transparent;
     border: none;
     color: white;
+}
+.show-hide-btn:hover {
+    color: gray;
 }
 .hide-btn {
     background-color: transparent;

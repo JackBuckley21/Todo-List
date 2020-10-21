@@ -47,7 +47,7 @@ class Form extends Component {
                 .then((res) => {
                     console.log(res.data);
 
-                    this.setState({ todos: res.data });
+                    this.setState({ todos: res.data, newTodo: "" });
                 })
                 .catch((err) => console.log(err));
         }
