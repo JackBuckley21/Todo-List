@@ -3,6 +3,7 @@ import TodoArea from "./TodoArea.js";
 import axios from "axios";
 import {
     EyeClosedIcon,
+    EyeIcon,
     PlusCircleIcon,
     TasklistIcon,
     XCircleIcon,
@@ -16,13 +17,31 @@ class Form extends Component {
             todos: [],
             hideComplete: false,
             newTodo: "",
+            editTodo: "",
         };
 
         this.getTodos();
     }
 
-    //Handles the change state of the input box//
+    // Handles Button Text and Icon Change
+    changeEye(hide) {
+        if (hide) {
+            return (
+                <div>
+                    Show Completed Todos {""}
+                    <EyeIcon size={20} />
+                </div>
+            );
+        }
+        return (
+            <div>
+                Hide Complete Todos {""}
+                <EyeClosedIcon size={20} />
+            </div>
+        );
+    }
 
+    //Handles the change state of the input box//
     handleChange(event) {
         this.setState({ [event.target.name]: event.target.value });
     }
@@ -48,6 +67,22 @@ class Form extends Component {
                     console.log(res.data);
 
                     this.setState({ todos: res.data, newTodo: "" });
+                })
+                .catch((err) => console.log(err));
+        }
+    }
+
+    todoEdit(todoId) {
+        if (!this.state.editTodo.trim()) {
+            alert("Please enter valid characters");
+        } else {
+            axios
+                .post(baseUrl + "/todos/update-todo/" + todoId, {
+                    text: this.state.todos.editTodo,
+                })
+                .then((res) => {
+                    console.log(res.data);
+                    this.setState({ todos: res.data, editTodo: "" });
                 })
                 .catch((err) => console.log(err));
         }
@@ -123,6 +158,27 @@ class Form extends Component {
                 console.log(err);
             });
     }
+    isImportant(todoId) {
+        axios
+            .put(baseUrl + "/todos/is-important/" + todoId)
+            .then((res) => {
+                console.log(res);
+                let todoImportant = this.state.todos.map((todo) => {
+                    if (todo._id == todoId) {
+                        todo.important = !todo.important;
+                    }
+                    console.log(todoImportant);
+                    return todo;
+                });
+
+                this.setState({
+                    todos: todoImportant,
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
 
     showHideCompletedTodos(event) {
         event.preventDefault();
@@ -134,6 +190,7 @@ class Form extends Component {
     }
 
     render() {
+        const isHidden = this.state.hideComplete;
         return (
             <div className="container">
                 <h1>Todo App</h1>
@@ -167,8 +224,7 @@ class Form extends Component {
                                         this.showHideCompletedTodos(event)
                                     }
                                 >
-                                    Show/Hide Completed Todos{" "}
-                                    <EyeClosedIcon size={20} />
+                                    {this.changeEye(this.state.hideComplete)}
                                 </button>
                             </label>
                             <button
@@ -192,8 +248,12 @@ class Form extends Component {
                     <div className="todo-area">
                         <TodoArea
                             todos={this.state.todos}
+                            editTodoHandler={(event) => this.todoEdit(event)}
                             completeHandler={(event) => this.isComplete(event)}
                             removeHandler={(event) => this.removeTodo(event)}
+                            importantHandler={(event) =>
+                                this.isImportant(event)
+                            }
                             hideComplete={this.state.hideComplete}
                         />
                     </div>

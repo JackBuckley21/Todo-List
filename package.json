@@ -63,6 +63,7 @@
         "mongoose": "^5.10.9",
         "node": "^14.13.1",
         "react": "^16.13.1",
-        "react-dom": "^16.13.1"
+        "react-dom": "^16.13.1",
+        "react-draggable": "^4.4.3"
     }
 }

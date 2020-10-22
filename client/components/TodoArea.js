@@ -22,13 +22,19 @@ class TodoArea extends Component {
                         removeHandler={(todoId) => {
                             this.props.removeHandler(todoId);
                         }}
+                        importantHandler={(todoId) => {
+                            this.props.importantHandler(todoId);
+                        }}
+                        editTodoHandler={(todoId) => {
+                            this.props.editTodoHandler(todoId);
+                        }}
                     />
                 );
             }
         }
 
         //todoStates
-        return <div class="Todo-List">{todos}</div>;
+        return <div className="Todo-List">{todos}</div>;
     }
 }
 

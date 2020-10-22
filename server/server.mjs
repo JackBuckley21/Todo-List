@@ -27,10 +27,38 @@ app.get("/todos", (req, res) => {
 
 app.post("/todos/new-todo", function (req, res) {
     let newTodo = req.body.text;
-    let newTodos = new todos({ text: newTodo, isComplete: false });
+    let newTodos = new todos({
+        text: newTodo,
+        isComplete: false,
+        important: false,
+    });
     newTodos.save();
     serverTodos.push(newTodos);
     res.send(serverTodos);
+});
+
+app.post("/todos/update-todo/:id", function (req, res) {
+    let updatedTodo = req.body.text;
+
+    serverTodos = serverTodos.map((todo) => {
+        if (todo._id == req.params.id) {
+            text = updatedTodo;
+            importantStatus = todo.important;
+        }
+        return todo;
+    });
+
+    todos.findByIdAndUpdate(
+        req.params.id,
+        {
+            text: updatedTodo,
+        },
+        { useFindAndModify: false },
+        (err) => {
+            console.log(err);
+        }
+    );
+    res.send(true);
 });
 
 app.delete("/todos/delete/:id", function (req, res) {
@@ -95,7 +123,28 @@ app.put("/todos/is-complete/:id", function (req, res) {
 
     res.send(true);
 });
+app.put("/todos/is-important/:id", function (req, res) {
+    console.log(req.params.id);
+    let importantStatus;
 
+    serverTodos = serverTodos.map((todo) => {
+        if (todo._id == req.params.id) {
+            todo.important = !todo.important;
+            importantStatus = todo.important;
+        }
+        return todo;
+    });
+
+    todos.findByIdAndUpdate(
+        req.params.id,
+        { important: importantStatus },
+        { useFindAndModify: false },
+        (err) => {
+            console.log(err);
+        }
+    );
+    res.send(true);
+});
 app.listen(5000, () => {
     console.log("Listening to port: 5000");
 });

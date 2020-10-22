@@ -3,6 +3,7 @@ const { Schema } = mongoose;
 
 const todoSchema = new Schema({
     text: String,
+    important: Boolean,
     isComplete: Boolean,
 });
 
