@@ -1,15 +1,28 @@
 import React, { Component } from "react";
 import { CheckCircleIcon, StopIcon, TrashIcon } from "@primer/octicons-react";
+import Form from "./App";
+import {todo} from './iTodo'
 
-class todoStates extends Component {
-    constructor(props) {
+type todoAProps={ 
+    todo: todo ,
+    completeHandler: (todoId:string) => void
+    removeHandler: (todoId:string) => void
+    importantHandler:(todoId: string)=> void
+    
+}
+
+
+class todoStates extends Component <todoAProps, any> {
+    constructor(props: todoAProps) {
         super(props);
-        this.state = { isComplete: this.props.complete };
+         this.state = { 
+            //  isComplete: this.props.complete 
+            };
     }
 
     render() {
         return (
-            <div
+            <div draggable = {true}
                 className="todos"
                 style={{
                     backgroundColor: this.props.todo.important
@@ -17,22 +30,9 @@ class todoStates extends Component {
                         : "",
                 }}
             >
-                <button
-                    className="edit"
-                    title="Edit Todo"
-                    onClick={() =>
-                        this.props.editTodoHandler(this.props.todo._id)
-                    }
-                >
-                    {this.props.todo.text}
-                </button>
-
-                <input
-                    style={{
-                        display: this.props.todo.editTodo ? "" : "none",
-                    }}
-                ></input>
-
+        
+                {this.props.todo.text}
+                
                 <button
                     title="Completed"
                     style={{
@@ -54,7 +54,6 @@ class todoStates extends Component {
                 >
                     <TrashIcon size={20} />
                 </button>
-
                 <button
                     title="Important"
                     className="button important-handler-btn right"

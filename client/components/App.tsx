@@ -1,5 +1,6 @@
-import React, { Component } from "react";
-import TodoArea from "./TodoArea.js";
+import React, { Component, MouseEventHandler } from "react";
+import TodoArea from "./TodoArea";
+import ImportantArea from "./TodoArea";
 import axios from "axios";
 import {
     EyeClosedIcon,
@@ -8,10 +9,22 @@ import {
     TasklistIcon,
     XCircleIcon,
 } from "@primer/octicons-react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import {todo} from "./iTodo"
+
 const baseUrl = "api/";
 
-class Form extends Component {
-    constructor(props) {
+
+type AState={
+    todos: todo[]
+    hideComplete: boolean
+    newTodo: string
+    editTodo:string
+}
+
+class Form extends Component <{}, AState> {
+    constructor(props: {}) {
         super(props);
         this.state = {
             todos: [],
@@ -24,7 +37,7 @@ class Form extends Component {
     }
 
     // Handles Button Text and Icon Change
-    changeEye(hide) {
+    changeEye(hide: boolean) {
         if (hide) {
             return (
                 <div>
@@ -36,14 +49,14 @@ class Form extends Component {
         return (
             <div>
                 Hide Complete Todos {""}
-                <EyeClosedIcon size={20} />
+                <EyeClosedIcon size={20}  />
             </div>
         );
     }
 
     //Handles the change state of the input box//
-    handleChange(event) {
-        this.setState({ [event.target.name]: event.target.value });
+    handleChange(event: any,) {
+        this.setState({...this.state, [event.target.name]: event.target.value });
     }
 
     getTodos() {
@@ -53,13 +66,14 @@ class Form extends Component {
         });
     }
 
-    addTodo(event) {
+    addTodo(event:React.MouseEvent<HTMLElement>) {
         event.preventDefault();
 
-        const { todos, newTodo, nextId } = this.state;
+
 
         if (!this.state.newTodo.trim()) {
-            alert("Please enter a valid todo item!");
+            // alert("Please enter a valid todo item!");
+            toast.error("Please enter a valid todo item!");
         } else {
             axios
                 .post("api/todos/new-todo", { text: this.state.newTodo })
@@ -72,23 +86,31 @@ class Form extends Component {
         }
     }
 
-    todoEdit(todoId) {
+    todoEdit(event:React.MouseEvent<HTMLElement>, todoId:String) {
+        event.preventDefault();
         if (!this.state.editTodo.trim()) {
             alert("Please enter valid characters");
         } else {
             axios
                 .post(baseUrl + "/todos/update-todo/" + todoId, {
-                    text: this.state.todos.editTodo,
+                    // text: this.state.todos.editTodo,
                 })
                 .then((res) => {
-                    console.log(res.data);
-                    this.setState({ todos: res.data, editTodo: "" });
+                    let editTodo = this.state.todos.map((todo:any) => {
+                        if (todo._id == todoId) {
+                            todo.text == todo.editTodo;
+                        }
+                        return todo;
+                    });
+                    this.setState({
+                        todos: editTodo,
+                    });
                 })
                 .catch((err) => console.log(err));
         }
     }
 
-    removeAll(event) {
+    removeAll(event:React.MouseEvent<HTMLElement>) {
         event.preventDefault();
         axios
             .delete(baseUrl + "/todos/delete-all")
@@ -96,16 +118,16 @@ class Form extends Component {
                 this.setState({
                     todos: [],
                 });
+                toast.dark("All todos removed");
             })
             .catch((err) => console.log(err));
     }
 
-    removeTodo(todoId) {
+    removeTodo(todoId:String) {
         axios
             .delete(baseUrl + "/todos/delete/" + todoId)
             .then((res) => {
                 console.log(res);
-                console.log(this.state.todos);
                 let remove = this.state.todos.filter(
                     (todo) => todo._id != todoId
                 );
@@ -114,13 +136,15 @@ class Form extends Component {
                 this.setState({
                     todos: remove,
                 });
+                toast.dark("Todo Removed");
             })
             .catch((err) => {
                 console.log(err);
+                toast.error("Failed to remove todo");
             });
     }
 
-    clearCompleteTodos(event) {
+    clearCompleteTodos(event:React.MouseEvent<HTMLElement>) {
         event.preventDefault();
 
         axios
@@ -128,7 +152,7 @@ class Form extends Component {
             .then((res) => {
                 console.log(res.data);
 
-                let clear = this.state.todos.filter((todo) => !todo.isComplete);
+                let clear = this.state.todos.filter((todo:any) => !todo.isComplete);
 
                 this.setState({ todos: clear });
             })
@@ -137,12 +161,12 @@ class Form extends Component {
             });
     }
 
-    isComplete(todoId) {
+    isComplete(todoId:String) {
         axios
             .put(baseUrl + "/todos/is-complete/" + todoId)
             .then((res) => {
                 console.log(res);
-                let todoComplete = this.state.todos.map((todo) => {
+                let todoComplete = this.state.todos.map((todo:any) => {
                     if (todo._id == todoId) {
                         todo.isComplete = !todo.isComplete;
                     }
@@ -156,14 +180,15 @@ class Form extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                toast.error("Failed to mark as complete");
             });
     }
-    isImportant(todoId) {
+    isImportant(todoId:String) {
         axios
             .put(baseUrl + "/todos/is-important/" + todoId)
             .then((res) => {
                 console.log(res);
-                let todoImportant = this.state.todos.map((todo) => {
+                let todoImportant = this.state.todos.map((todo:any) => {
                     if (todo._id == todoId) {
                         todo.important = !todo.important;
                     }
@@ -180,22 +205,20 @@ class Form extends Component {
             });
     }
 
-    showHideCompletedTodos(event) {
+    showHideCompletedTodos(event: React.MouseEvent<HTMLElement>) {
         event.preventDefault();
-        this.state.hideComplete = !this.state.hideComplete;
+        this.setState({hideComplete : !this.state.hideComplete});
 
-        this.setState({
-            todos: this.state.todos,
-        });
     }
 
     render() {
-        const isHidden = this.state.hideComplete;
+        
         return (
             <div className="container">
                 <h1>Todo App</h1>
                 <section className="todo-form">
                     <form>
+                        <ToastContainer/>
                         <input
                             className="newTodoInput"
                             id="new_todo_input"
@@ -211,7 +234,7 @@ class Form extends Component {
                                 display: this.state.newTodo ? "" : "none",
                             }}
                             className="base-btn"
-                            onClick={(event) => this.addTodo(event)}
+                            onClick={(event:any) => this.addTodo(event)}
                             id="new_todo_submit"
                         >
                             <PlusCircleIcon size={20} />
@@ -245,14 +268,15 @@ class Form extends Component {
                             </button>
                         </div>
                     </form>
+                    <div>
+                    
+                    </div>
                     <div className="todo-area">
                         <TodoArea
                             todos={this.state.todos}
-                            editTodoHandler={(event) => this.todoEdit(event)}
                             completeHandler={(event) => this.isComplete(event)}
                             removeHandler={(event) => this.removeTodo(event)}
-                            importantHandler={(event) =>
-                                this.isImportant(event)
+                            importantHandler={(event) => this.isImportant(event)
                             }
                             hideComplete={this.state.hideComplete}
                         />
